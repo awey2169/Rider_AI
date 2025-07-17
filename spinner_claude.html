@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Name Spinner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        button {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(78, 205, 196, 0.6);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .text-input-container {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            resize: vertical;
+            backdrop-filter: blur(10px);
+        }
+
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .spinner-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 30px auto;
+            border-radius: 50%;
+            border: 5px solid rgba(255, 255, 255, 0.3);
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+        }
+
+        .spinner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transition: transform 3s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .name-ball {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 12px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+
+        .arrow {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-top: 30px solid #ff6b6b;
+            z-index: 10;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        }
+
+        .result {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .result h2 {
+            color: #ff6b6b;
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .result p {
+            color: white;
+            font-size: 1.2em;
+        }
+
+        .student-count {
+            text-align: center;
+            color: white;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .reset-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+            margin-top: 15px;
+        }
+
+        .reset-btn:hover {
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .spinning .name-ball {
+            animation: pulse 0.1s infinite;
+        }
+
+        @media (max-width: 600px) {
+            .spinner-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .name-ball {
+                width: 45px;
+                height: 45px;
+                font-size: 10px;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Student Name Spinner</h1>
+        
+        <div class="text-input-container">
+            <textarea id="nameInput" placeholder="Enter student names separated by commas or new lines..."></textarea>
+        </div>
+        
+        <div class="controls">
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" accept=".txt,.csv">
+                <label for="fileInput" class="file-input-label">📁 Upload File</label>
+            </div>
+            <button id="demoBtn">🎲 Load Demo Names</button>
+            <button id="addNamesBtn">➕ Add Names</button>
+            <button id="spinBtn" disabled>🎪 SPIN!</button>
+        </div>
+        
+        <div class="student-count" id="studentCount">No students loaded</div>
+        
+        <div class="spinner-container">
+            <div class="arrow"></div>
+            <div class="spinner" id="spinner"></div>
+        </div>
+        
+        <div class="result" id="result" style="display: none;">
+            <h2 id="selectedName"></h2>
+            <p>has been selected!</p>
+            <button class="reset-btn" id="resetBtn">🔄 Reset All Students</button>
+        </div>
+    </div>
+
+    <script>
+        class StudentSpinner {
+            constructor() {
+                this.allStudents = [];
+                this.availableStudents = [];
+                this.isSpinning = false;
+                this.colors = [
+                    '#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7',
+                    '#dda0dd', '#98d8c8', '#ff7675', '#fd79a8', '#fdcb6e',
+                    '#e17055', '#81ecec', '#74b9ff', '#a29bfe', '#6c5ce7',
+                    '#00b894', '#00cec9', '#55a3ff', '#ff9ff3', '#54a0ff'
+                ];
+                this.initializeElements();
+                this.bindEvents();
+            }
+
+            initializeElements() {
+                this.nameInput = document.getElementById('nameInput');
+                this.fileInput = document.getElementById('fileInput');
+                this.demoBtn = document.getElementById('demoBtn');
+                this.addNamesBtn = document.getElementById('addNamesBtn');
+                this.spinBtn = document.getElementById('spinBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.spinner = document.getElementById('spinner');
+                this.result = document.getElementById('result');
+                this.selectedName = document.getElementById('selectedName');
+                this.studentCount = document.getElementById('studentCount');
+            }
+
+            bindEvents() {
+                this.demoBtn.addEventListener('click', () => this.loadDemoNames());
+                this.addNamesBtn.addEventListener('click', () => this.addNames());
+                this.spinBtn.addEventListener('click', () => this.spin());
+                this.resetBtn.addEventListener('click', () => this.resetStudents());
+                this.fileInput.addEventListener('change', (e) => this.handleFileUpload(e));
+            }
+
+            loadDemoNames() {
+                const demoNames = [
+                    'Alice Johnson', 'Bob Smith', 'Charlie Brown', 'Diana Prince',
+                    'Ethan Hunt', 'Fiona Apple', 'George Lucas', 'Hannah Montana',
+                    'Ian Fleming', 'Julia Roberts', 'Kevin Hart', 'Luna Lovegood',
+                    'Michael Jordan', 'Nina Simone', 'Oliver Twist', 'Penny Lane',
+                    'Quincy Jones', 'Rachel Green', 'Sam Wilson', 'Tina Turner'
+                ];
+                this.nameInput.value = demoNames.join(', ');
+                this.addNames();
+            }
+
+            processNames(namesText) {
+                const names = namesText.split(/[,\n\r]+/)
+                    .map(name => name.trim())
+                    .filter(name => name.length > 0);
+                
+                return this.handleDuplicateFirstNames(names);
+            }
+
+            handleDuplicateFirstNames(fullNames) {
+                const processedNames = [];
+                const firstNameCounts = {};
+                
+                // Count occurrences of each first name
+                fullNames.forEach(fullName => {
+                    const firstName = fullName.split(' ')[0];
+                    firstNameCounts[firstName] = (firstNameCounts[firstName] || 0) + 1;
+                });
+                
+                // Process names based on duplicates
+                const firstNameUsed = {};
+                fullNames.forEach(fullName => {
+                    const parts = fullName.split(' ');
+                    const firstName = parts[0];
+                    
+                    if (firstNameCounts[firstName] > 1) {
+                        // Use first name + last initial if available
+                        const lastInitial = parts.length > 1 ? parts[parts.length - 1][0] : '';
+                        const displayName = lastInitial ? `${firstName} ${lastInitial}.` : firstName;
+                        processedNames.push(displayName);
+                    } else {
+                        // Use just first name
+                        processedNames.push(firstName);
+                    }
+                });
+                
+                return processedNames;
+            }
+
+            addNames() {
+                const namesText = this.nameInput.value.trim();
+                if (!namesText) {
+                    alert('Please enter some names first!');
+                    return;
+                }
+
+                this.allStudents = this.processNames(namesText);
+                this.availableStudents = [...this.allStudents];
+                this.updateDisplay();
+                this.nameInput.value = '';
+            }
+
+            async handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const text = await file.text();
+                this.nameInput.value = text;
+                this.addNames();
+            }
+
+            updateDisplay() {
+                this.updateStudentCount();
+                this.renderSpinner();
+                this.spinBtn.disabled = this.availableStudents.length === 0;
+            }
+
+            updateStudentCount() {
+                const available = this.availableStudents.length;
+                const total = this.allStudents.length;
+                this.studentCount.textContent = `${available} of ${total} students remaining`;
+            }
+
+            renderSpinner() {
+                this.spinner.innerHTML = '';
+                
+                if (this.availableStudents.length === 0) {
+                    this.spinner.innerHTML = '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; font-size: 18px; text-align: center;">No students<br>remaining</div>';
+                    return;
+                }
+
+                const angleStep = 360 / this.availableStudents.length;
+                const radius = 140;
+
+                this.availableStudents.forEach((name, index) => {
+                    const angle = index * angleStep;
+                    const radians = (angle * Math.PI) / 180;
+                    const x = radius * Math.cos(radians - Math.PI/2) + 200;
+                    const y = radius * Math.sin(radians - Math.PI/2) + 200;
+
+                    const ball = document.createElement('div');
+                    ball.className = 'name-ball';
+                    ball.textContent = name;
+                    ball.style.left = `${x - 30}px`;
+                    ball.style.top = `${y - 30}px`;
+                    ball.style.background = this.colors[index % this.colors.length];
+                    
+                    this.spinner.appendChild(ball);
+                });
+            }
+
+            spin() {
+                if (this.isSpinning || this.availableStudents.length === 0) return;
+
+                this.isSpinning = true;
+                this.spinBtn.disabled = true;
+                this.result.style.display = 'none';
+                this.spinner.classList.add('spinning');
+
+                // Random number of spins (3-7 full rotations)
+                const spins = 3 + Math.random() * 4;
+                const finalRotation = spins * 360;
+                
+                // Select random student
+                const selectedIndex = Math.floor(Math.random() * this.availableStudents.length);
+                const selectedStudent = this.availableStudents[selectedIndex];
+                
+                // Calculate angle to land on selected student
+                const anglePerStudent = 360 / this.availableStudents.length;
+                const targetAngle = selectedIndex * anglePerStudent;
+                const totalRotation = finalRotation + (360 - targetAngle);
+
+                this.spinner.style.transform = `rotate(${totalRotation}deg)`;
+
+                setTimeout(() => {
+                    this.isSpinning = false;
+                    this.spinner.classList.remove('spinning');
+                    this.showResult(selectedStudent);
+                    this.removeStudent(selectedIndex);
+                    this.updateDisplay();
+                }, 3000);
+            }
+
+            showResult(name) {
+                this.selectedName.textContent = name;
+                this.result.style.display = 'block';
+            }
+
+            removeStudent(index) {
+                this.availableStudents.splice(index, 1);
+            }
+
+            resetStudents() {
+                this.availableStudents = [...this.allStudents];
+                this.result.style.display = 'none';
+                this.spinner.style.transform = 'rotate(0deg)';
+                this.updateDisplay();
+            }
+        }
+
+        // Initialize the spinner when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new StudentSpinner();
+        });
+    </script>
+</body>
+</html>
