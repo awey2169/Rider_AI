@@ -1,0 +1,144 @@
+import { useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import Papa from 'papaparse';
+import { motion, AnimatePresence } from 'framer-motion';
+
+export default function StudentSpinner() {
+  const [students, setStudents] = useState([]);
+  const [selectedStudent, setSelectedStudent] = useState(null);
+  const [spinning, setSpinning] = useState(false);
+  const [wheelRotation, setWheelRotation] = useState(0);
+
+  const parseCSV = (text) => {
+    const parsed = Papa.parse(text, { header: false });
+    const flat = parsed.data.flat().filter((name) => name.trim() !== '');
+    setStudents(formatNames(flat));
+    setSelectedStudent(null);
+  };
+
+  const formatNames = (names) => {
+    const firstNameMap = {};
+    names.forEach((fullName) => {
+      const parts = fullName.trim().split(/\s+/);
+      const firstName = parts[0];
+      const lastInitial = parts[1] ? parts[1][0] + '.' : '';
+      if (!firstNameMap[firstName]) {
+        firstNameMap[firstName] = [];
+      }
+      firstNameMap[firstName].push(lastInitial);
+    });
+
+    return names.map((fullName) => {
+      const parts = fullName.trim().split(/\s+/);
+      const firstName = parts[0];
+      const lastInitial = parts[1] ? parts[1][0] + '.' : '';
+      if (firstNameMap[firstName].length > 1) {
+        return `${firstName} ${lastInitial}`;
+      }
+      return firstName;
+    });
+  };
+
+  const handleFileUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        parseCSV(e.target.result);
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const chooseRandomStudent = () => {
+    if (students.length === 0) return;
+    const index = Math.floor(Math.random() * students.length);
+    const chosen = students[index];
+    const anglePerSlice = 360 / students.length;
+    const targetAngle = 360 * 5 + index * anglePerSlice; // 5 full spins
+
+    setWheelRotation(targetAngle);
+    setSpinning(true);
+
+    setTimeout(() => {
+      setSelectedStudent(chosen);
+      setStudents((prev) => prev.filter((_, i) => i !== index));
+      setSpinning(false);
+    }, 4000);
+  };
+
+  const loadDemoNames = () => {
+    const demo = [
+      'Alice Johnson', 'Bob Smith', 'Alice Taylor', 'Carlos Rivera', 'Dina Lee', 'Eli Zhang'
+    ];
+    setStudents(formatNames(demo));
+    setSelectedStudent(null);
+  };
+
+  return (
+    <div className="p-4 max-w-xl mx-auto space-y-4">
+      <Card>
+        <CardContent className="p-4 space-y-2">
+          <h2 className="text-xl font-semibold">Student Name Spinner</h2>
+
+          <textarea
+            rows={4}
+            placeholder="Paste names here, one per line or comma-separated"
+            className="w-full p-2 border rounded"
+            onBlur={(e) => parseCSV(e.target.value.replace(/\n/g, ','))}
+          />
+
+          <input
+            type="file"
+            accept=".csv, .txt"
+            onChange={handleFileUpload}
+            className="block mt-2"
+          />
+
+          <div className="flex gap-2 mt-2">
+            <Button onClick={chooseRandomStudent} disabled={spinning || students.length === 0}>
+              {spinning ? 'Spinning...' : 'Spin'}
+            </Button>
+            <Button variant="secondary" onClick={loadDemoNames} disabled={spinning}>
+              Load Demo
+            </Button>
+          </div>
+
+          <div className="relative w-64 h-64 mx-auto mt-6">
+            <motion.div
+              className="absolute inset-0 rounded-full border-4 border-gray-300 flex items-center justify-center"
+              animate={{ rotate: wheelRotation }}
+              transition={{ duration: 4, ease: 'easeInOut' }}
+              style={{ position: 'relative' }}
+            >
+              {students.map((name, i) => {
+                const angle = (360 / students.length) * i;
+                return (
+                  <div
+                    key={i}
+                    className="absolute left-1/2 top-1/2 transform origin-bottom text-xs text-center"
+                    style={{
+                      transform: `rotate(${angle}deg) translateY(-120px)`
+                    }}
+                  >
+                    {name}
+                  </div>
+                );
+              })}
+            </motion.div>
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+              <div className="w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-black"></div>
+            </div>
+          </div>
+
+          {selectedStudent && !spinning && (
+            <div className="text-center mt-4 text-2xl font-bold text-green-600">
+              🎉 {selectedStudent} 🎉
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
