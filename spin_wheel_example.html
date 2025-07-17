@@ -1,144 +1,163 @@
-import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import Papa from 'papaparse';
-import { motion, AnimatePresence } from 'framer-motion';
-
-export default function StudentSpinner() {
-  const [students, setStudents] = useState([]);
-  const [selectedStudent, setSelectedStudent] = useState(null);
-  const [spinning, setSpinning] = useState(false);
-  const [wheelRotation, setWheelRotation] = useState(0);
-
-  const parseCSV = (text) => {
-    const parsed = Papa.parse(text, { header: false });
-    const flat = parsed.data.flat().filter((name) => name.trim() !== '');
-    setStudents(formatNames(flat));
-    setSelectedStudent(null);
-  };
-
-  const formatNames = (names) => {
-    const firstNameMap = {};
-    names.forEach((fullName) => {
-      const parts = fullName.trim().split(/\s+/);
-      const firstName = parts[0];
-      const lastInitial = parts[1] ? parts[1][0] + '.' : '';
-      if (!firstNameMap[firstName]) {
-        firstNameMap[firstName] = [];
-      }
-      firstNameMap[firstName].push(lastInitial);
-    });
-
-    return names.map((fullName) => {
-      const parts = fullName.trim().split(/\s+/);
-      const firstName = parts[0];
-      const lastInitial = parts[1] ? parts[1][0] + '.' : '';
-      if (firstNameMap[firstName].length > 1) {
-        return `${firstName} ${lastInitial}`;
-      }
-      return firstName;
-    });
-  };
-
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        parseCSV(e.target.result);
-      };
-      reader.readAsText(file);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Spinner</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 700px;
+      margin: auto;
     }
-  };
+    textarea, input[type="file"] {
+      width: 100%;
+      margin-top: 10px;
+      padding: 10px;
+    }
+    button {
+      margin-top: 10px;
+      margin-right: 10px;
+      padding: 10px 15px;
+      cursor: pointer;
+    }
+    .wheel-container {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 30px auto;
+    }
+    .wheel {
+      width: 100%;
+      height: 100%;
+      border: 5px solid #ccc;
+      border-radius: 50%;
+      position: relative;
+      transition: transform 4s ease-in-out;
+    }
+    .slice {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      transform-origin: bottom center;
+      font-size: 12px;
+    }
+    .pointer {
+      position: absolute;
+      top: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 10px solid transparent;
+      border-right: 10px solid transparent;
+      border-bottom: 20px solid black;
+    }
+    .winner {
+      text-align: center;
+      font-size: 24px;
+      color: green;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
 
-  const chooseRandomStudent = () => {
-    if (students.length === 0) return;
-    const index = Math.floor(Math.random() * students.length);
-    const chosen = students[index];
-    const anglePerSlice = 360 / students.length;
-    const targetAngle = 360 * 5 + index * anglePerSlice; // 5 full spins
+  <h2>Student Name Spinner</h2>
 
-    setWheelRotation(targetAngle);
-    setSpinning(true);
+  <textarea id="nameInput" rows="4" placeholder="Paste names here, one per line or comma-separated"></textarea>
+  <input type="file" id="fileInput" accept=".csv,.txt"/>
+  <br/>
+  <button onclick="startSpin()">Spin</button>
+  <button onclick="loadDemo()">Load Demo</button>
 
-    setTimeout(() => {
-      setSelectedStudent(chosen);
-      setStudents((prev) => prev.filter((_, i) => i !== index));
-      setSpinning(false);
-    }, 4000);
-  };
+  <div class="wheel-container">
+    <div class="pointer"></div>
+    <div class="wheel" id="wheel"></div>
+  </div>
 
-  const loadDemoNames = () => {
-    const demo = [
-      'Alice Johnson', 'Bob Smith', 'Alice Taylor', 'Carlos Rivera', 'Dina Lee', 'Eli Zhang'
-    ];
-    setStudents(formatNames(demo));
-    setSelectedStudent(null);
-  };
+  <div class="winner" id="winner"></div>
 
-  return (
-    <div className="p-4 max-w-xl mx-auto space-y-4">
-      <Card>
-        <CardContent className="p-4 space-y-2">
-          <h2 className="text-xl font-semibold">Student Name Spinner</h2>
+  <script>
+    let students = [];
+    let rotation = 0;
 
-          <textarea
-            rows={4}
-            placeholder="Paste names here, one per line or comma-separated"
-            className="w-full p-2 border rounded"
-            onBlur={(e) => parseCSV(e.target.value.replace(/\n/g, ','))}
-          />
+    function formatNames(names) {
+      const firstNameMap = {};
+      names.forEach(name => {
+        const [first, last] = name.trim().split(/\s+/);
+        const key = first;
+        const val = last ? last[0] + '.' : '';
+        if (!firstNameMap[key]) firstNameMap[key] = [];
+        firstNameMap[key].push(val);
+      });
 
-          <input
-            type="file"
-            accept=".csv, .txt"
-            onChange={handleFileUpload}
-            className="block mt-2"
-          />
+      return names.map(name => {
+        const [first, last] = name.trim().split(/\s+/);
+        const lastInitial = last ? last[0] + '.' : '';
+        return firstNameMap[first].length > 1 ? `${first} ${lastInitial}` : first;
+      });
+    }
 
-          <div className="flex gap-2 mt-2">
-            <Button onClick={chooseRandomStudent} disabled={spinning || students.length === 0}>
-              {spinning ? 'Spinning...' : 'Spin'}
-            </Button>
-            <Button variant="secondary" onClick={loadDemoNames} disabled={spinning}>
-              Load Demo
-            </Button>
-          </div>
+    function drawWheel() {
+      const wheel = document.getElementById("wheel");
+      wheel.innerHTML = '';
+      const anglePer = 360 / students.length;
+      students.forEach((name, i) => {
+        const slice = document.createElement('div');
+        slice.className = 'slice';
+        slice.innerText = name;
+        slice.style.transform = `rotate(${i * anglePer}deg) translateY(-140px)`;
+        wheel.appendChild(slice);
+      });
+    }
 
-          <div className="relative w-64 h-64 mx-auto mt-6">
-            <motion.div
-              className="absolute inset-0 rounded-full border-4 border-gray-300 flex items-center justify-center"
-              animate={{ rotate: wheelRotation }}
-              transition={{ duration: 4, ease: 'easeInOut' }}
-              style={{ position: 'relative' }}
-            >
-              {students.map((name, i) => {
-                const angle = (360 / students.length) * i;
-                return (
-                  <div
-                    key={i}
-                    className="absolute left-1/2 top-1/2 transform origin-bottom text-xs text-center"
-                    style={{
-                      transform: `rotate(${angle}deg) translateY(-120px)`
-                    }}
-                  >
-                    {name}
-                  </div>
-                );
-              })}
-            </motion.div>
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <div className="w-0 h-0 border-l-8 border-r-8 border-b-8 border-transparent border-b-black"></div>
-            </div>
-          </div>
+    function startSpin() {
+      if (students.length === 0) return;
+      const index = Math.floor(Math.random() * students.length);
+      const anglePer = 360 / students.length;
+      const target = 360 * 5 + index * anglePer;
+      rotation += target;
+      const wheel = document.getElementById("wheel");
+      wheel.style.transform = `rotate(${rotation}deg)`;
 
-          {selectedStudent && !spinning && (
-            <div className="text-center mt-4 text-2xl font-bold text-green-600">
-              🎉 {selectedStudent} 🎉
-            </div>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
+      setTimeout(() => {
+        const winner = students[index];
+        students.splice(index, 1);
+        document.getElementById("winner").innerText = `🎉 ${winner} 🎉`;
+        drawWheel();
+      }, 4000);
+    }
+
+    function parseText(text) {
+      const entries = text.split(/[\n,]+/).map(s => s.trim()).filter(Boolean);
+      students = formatNames(entries);
+      drawWheel();
+      document.getElementById("winner").innerText = '';
+    }
+
+    document.getElementById("nameInput").addEventListener("blur", (e) => {
+      parseText(e.target.value);
+    });
+
+    document.getElementById("fileInput").addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => parseText(reader.result);
+      reader.readAsText(file);
+    });
+
+    function loadDemo() {
+      const demo = [
+        'Alice Johnson', 'Bob Smith', 'Alice Taylor', 'Carlos Rivera', 'Dina Lee', 'Eli Zhang'
+      ];
+      students = formatNames(demo);
+      drawWheel();
+      document.getElementById("winner").innerText = '';
+    }
+  </script>
+
+</body>
+</html>
