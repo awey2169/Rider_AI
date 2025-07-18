@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter 1: Statistical Basics Study Guide</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            color: #34495e;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        .accordion {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            cursor: pointer;
+            padding: 10px;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 16px;
+            transition: 0.4s;
+            width: 100%;
+            border-radius: 4px;
+        }
+        .accordion:hover {
+            background-color: #3498db;
+            color: #fff;
+        }
+        .panel {
+            padding: 0 18px;
+            background-color: #fff;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.2s ease-out;
+        }
+        .panel p {
+            margin: 10px 0;
+        }
+        .active, .accordion:hover {
+            background-color: #3498db;
+        }
+        .exercise-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .exercise-list li {
+            background: #ecf0f1;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .exercise-list li:hover {
+            background: #bdc3c7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chapter 1: Statistical Basics Study Guide</h1>
+        <div class="section">
+            <h2>Section 1.1: What is Statistics?</h2>
+            <button class="accordion">Key Concepts</button>
+            <div class="panel">
+                <p>Statistics is the study of collecting, classifying, organizing, analyzing, and interpreting data. It includes two branches: descriptive statistics (collecting and organizing data) and inferential statistics (analyzing and interpreting data).</p>
+                <p>Key terms: Individual, Variable, Population (N), Sample, Parameter, Statistic, Qualitative, Quantitative (Discrete/Continuous), Measurement Scales (Nominal, Ordinal, Interval, Ratio).</p>
+            </div>
+            <button class="accordion">Exercises</button>
+            <div class="panel">
+                <ul class="exercise-list">
+                    <li>Identify population, statistic, parameter, sample, and variable from given scenarios.</li>
+                    <li>Classify data as qualitative, quantitative discrete, or quantitative continuous.</li>
+                    <li>Determine measurement scales for different variables.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Section 1.2: Sampling Methods</h2>
+            <button class="accordion">Key Concepts</button>
+            <div class="panel">
+                <p>Sampling is used when collecting data from an entire population is impractical. Methods include Simple Random, Systematic, Stratified, and Cluster sampling. Avoid convenience sampling due to bias. A census measures every individual.</p>
+            </div>
+            <button class="accordion">Exercises</button>
+            <div class="panel">
+                <ul class="exercise-list">
+                    <li>Describe how to draw different types of samples (e.g., simple random, stratified).</li>
+                    <li>Classify sampling techniques as random, stratified, systematic, cluster, or convenience.</li>
+                </ul>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Section 1.3: Experimental Design</h2>
+            <button class="accordion">Key Concepts</button>
+            <div class="panel">
+                <p>Experimental design involves observational studies (watching/asking) and experiments (imposing treatments). Types include randomized two-treatment, randomized block, rigorously controlled, and matched pairs designs. Consider replication, blinding, and study types (cross-sectional, retrospective, prospective).</p>
+            </div>
+            <button class="accordion">Exercises</button>
+            <div class="panel">
+                <ul class="exercise-list">
+                    <li>Identify if a study is observational or experimental.</li>
+                    <li>Determine if an experiment is randomized or uses matched pairs.</li>
+                    <li>Classify study types (cross-sectional, retrospective, prospective).</li>
+                </ul>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Section 1.4: How Not to Do Statistics</h2>
+            <button class="accordion">Key Concepts</button>
+            <div class="panel">
+                <p>Avoid bias from funding, confounding variables, overgeneralization, and cause-effect misinterpretations. Watch for sampling errors, nonsampling errors, and survey biases (wording, order, non-response, voluntary response).</p>
+            </div>
+            <button class="accordion">Exercises</button>
+            <div class="panel">
+                <ul class="exercise-list">
+                    <li>Identify bias or issues in given studies.</li>
+                    <li>Explain cause-effect relationships or lack thereof.</li>
+                    <li>Discuss survey question biases.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var acc = document.getElementsByClassName("accordion");
+        for (var i = 0; i < acc.length; i++) {
+            acc[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var panel = this.nextElementSibling;
+                if (panel.style.maxHeight) {
+                    panel.style.maxHeight = null;
+                } else {
+                    panel.style.maxHeight = panel.scrollHeight + "px";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
